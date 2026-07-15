@@ -1,0 +1,50 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* House style ground. Ported from the prototype. */
+:root {
+  --paper: #f4f1ea;
+  --paper-2: #eae6db;
+  --ink: #14110f;
+  --ink-60: rgba(20, 17, 15, 0.6);
+  --ink-38: rgba(20, 17, 15, 0.38);
+  --rule: #dbd5c7;
+  --gate: #9f1239;
+
+  --ch-paid: #1d4ed8;
+  --ch-email: #047857;
+  --ch-sms: #6d28d9;
+  --ch-banner: #b45309;
+}
+
+@layer base {
+  * {
+    box-sizing: border-box;
+    /* Zero border-radius by default across the system. Chips opt back in. */
+    border-radius: 0;
+  }
+  html,
+  body {
+    margin: 0;
+    padding: 0;
+  }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-sans), system-ui, sans-serif;
+    font-size: 14px;
+    line-height: 1.45;
+    -webkit-font-smoothing: antialiased;
+  }
+  :focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 2px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+  }
+}

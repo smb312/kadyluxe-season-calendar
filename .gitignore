@@ -1,0 +1,26 @@
+# dependencies
+/node_modules
+.pnpm-store
+
+# next
+/.next
+/out
+next-env.d.ts
+
+# production
+/build
+
+# env — never commit keys
+.env
+.env.local
+.env*.local
+
+# misc
+.DS_Store
+*.pem
+/coverage
+/.vercel
+*.tsbuildinfo
+
+# seed input (exported from the prototype; provided out-of-band)
+/supabase/seed/*.json
