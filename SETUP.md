@@ -181,7 +181,11 @@ from the defaults, send me that list and I'll widen the aliases.
 ## 9. Deploy — **[Vercel]** (preview)
 
 1. **Import the repo** in Vercel (New Project → pick `kadyluxe-season-calendar`).
-   Framework auto-detects as Next.js. No build/output overrides needed.
+   `vercel.json` pins the framework to Next.js, the build to `next build`, and
+   the install to pnpm — so the preset resolves correctly even if the dashboard
+   guessed "Other". No build/output overrides to set by hand. If a stale project
+   still shows Framework Preset "Other", set it to **Next.js** once (or delete
+   and re-import) so it picks up `vercel.json`.
 2. **Environment variables** — Project → Settings → Environment Variables. Add
    these three and tick **Preview** (and Production) for each:
 
