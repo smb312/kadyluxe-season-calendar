@@ -10,6 +10,7 @@ import { FilterBar } from "@/components/filters/filter-bar";
 const VIEWS = [
   { href: "/calendar", label: "Calendar" },
   { href: "/list", label: "List" },
+  { href: "/team", label: "Team" },
 ];
 
 export function AppShell({ children }: { children: React.ReactNode }) {

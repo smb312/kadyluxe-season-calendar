@@ -12,6 +12,10 @@ import {
   type Channel,
 } from "@/lib/constants";
 
+function isNarrowed(f: ReturnType<typeof useFilters>): boolean {
+  return f.team !== "" || f.brandOnly || f.channels.size < CHANNELS.length || f.types.size < MOMENT_TYPES.length;
+}
+
 const CH_COLOR: Record<Channel, string> = {
   paid: "#1D4ED8",
   email: "#047857",
@@ -129,6 +133,15 @@ export function FilterBar() {
           );
         })}
       </div>
+
+      {isNarrowed(f) && (
+        <button
+          onClick={f.reset}
+          className="font-mono text-[10px] tracking-[0.08em] uppercase text-ink-60 underline underline-offset-2 hover:text-ink"
+        >
+          Clear filters
+        </button>
+      )}
     </div>
   );
 }
