@@ -178,12 +178,34 @@ from the defaults, send me that list and I'll widen the aliases.
 
 ---
 
-## 9. Deploy — **[Vercel]** (later)
+## 9. Deploy — **[Vercel]** (preview)
 
-Import the repo in Vercel. Add the same three env vars
-(`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`,
-`SUPABASE_SERVICE_ROLE_KEY`) in **Project → Settings → Environment Variables**.
-The service-role key stays server-side (used only by the admin API routes).
+1. **Import the repo** in Vercel (New Project → pick `kadyluxe-season-calendar`).
+   Framework auto-detects as Next.js. No build/output overrides needed.
+2. **Environment variables** — Project → Settings → Environment Variables. Add
+   these three and tick **Preview** (and Production) for each:
+
+   | Name | Value | Sensitive? | Notes |
+   |---|---|---|---|
+   | `NEXT_PUBLIC_SUPABASE_URL` | your project URL | No | inlined into the client bundle at build; must exist before the preview build |
+   | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | anon/public key | No | public by design; RLS is the boundary |
+   | `SUPABASE_SERVICE_ROLE_KEY` | service_role key | **Yes** | server-only (admin routes); never exposed to the browser |
+
+   The two `NEXT_PUBLIC_*` are inlined at build time — if you add them after a
+   deploy, **redeploy** so they take effect.
+3. **Preview URL.** Every push to `claude/session-3o22xy` builds a preview. Use
+   the stable branch alias (Deployments → the branch deploy → its
+   `…-git-claude-session-3o22xy-<scope>.vercel.app` URL) rather than the
+   per-commit hash URL, so it doesn't move under you.
+4. **Supabase auth for the preview domain** — Authentication → **URL
+   Configuration**: set **Site URL** to the preview branch-alias URL. Because
+   this app is **password-only** (no magic links, no OAuth, no email
+   confirmation), there are no auth redirects to allow-list, so nothing else is
+   required here. The browser talks to Supabase with the anon key from any
+   origin — no CORS/allowed-origins setup needed.
+
+That's it — the preview at the branch-alias URL is your test environment. Edits
+go through me on the branch; each push refreshes the same preview.
 
 ---
 
