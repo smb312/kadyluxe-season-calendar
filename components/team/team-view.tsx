@@ -8,6 +8,8 @@ import { pretty, monthKey } from "@/lib/dates";
 import { CHANNELS, MONTHS, TYPE_LABEL, type Channel } from "@/lib/constants";
 import type { Moment } from "@/lib/types";
 import { MomentDrawer, type EditTarget } from "@/components/moment/moment-drawer";
+import { useRealtimeMoments } from "@/lib/use-realtime";
+import { RealtimeIndicator } from "@/components/realtime-indicator";
 
 const CH_COLOR: Record<Channel, string> = {
   paid: "#1D4ED8",
@@ -25,10 +27,11 @@ const ACCENT: Record<string, string> = {
 };
 
 export function TeamView({ initialMoments }: { initialMoments: Moment[] }) {
-  const { teams, teamsByCode } = useApp();
+  const { teams, teamsByCode, profile } = useApp();
   const f = useFilters();
   const [moments, setMoments] = useState<Moment[]>(initialMoments);
   const [target, setTarget] = useState<EditTarget>(null);
+  const { otherEditorId } = useRealtimeMoments(setMoments, { currentUserId: profile.id });
 
   const team = f.team ? teamsByCode[f.team] : null;
 
@@ -163,6 +166,7 @@ export function TeamView({ initialMoments }: { initialMoments: Moment[] }) {
       )}
 
       <MomentDrawer target={target} onClose={() => setTarget(null)} onUpsert={upsert} onRemove={remove} />
+      <RealtimeIndicator otherEditorId={otherEditorId} />
     </div>
   );
 }

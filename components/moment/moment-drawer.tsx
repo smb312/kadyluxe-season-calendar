@@ -19,6 +19,8 @@ import {
 } from "@/lib/constants";
 import type { Moment, MomentInput } from "@/lib/types";
 import { pretty } from "@/lib/dates";
+import { MomentHistoryPanel } from "@/components/moment/moment-history";
+import { InventoryCompare } from "@/components/moment/inventory-compare";
 
 const CH_COLOR: Record<Channel, string> = {
   paid: "#1D4ED8",
@@ -452,6 +454,17 @@ export function MomentDrawer({
                   placeholder="Dependencies, licensing status, creative deadlines"
                 />
               </div>
+
+              {target?.mode === "edit" && (
+                <>
+                  <InventoryCompare teams={form.teams} licensing={form.licensing} />
+                  <MomentHistoryPanel
+                    momentId={target.moment.id}
+                    updatedBy={target.moment.updated_by}
+                    updatedAt={target.moment.updated_at}
+                  />
+                </>
+              )}
             </div>
 
             <div className="px-5 py-3.5 border-t border-rule flex gap-2 justify-between">

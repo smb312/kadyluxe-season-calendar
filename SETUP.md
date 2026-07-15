@@ -50,10 +50,12 @@ time (paste, Run, confirm success, next):
 1. `supabase/migrations/0001_schema.sql` — tables + enums
 2. `supabase/migrations/0002_rls.sql` — row-level security + helpers
 3. `supabase/migrations/0003_history_trigger.sql` — audit trail + stamping
+4. `supabase/migrations/0004_realtime_directory.sql` — member directory read + Realtime
+5. `supabase/migrations/0005_inventory.sql` — inventory snapshot table
 
 Then seed the team registry:
 
-4. `supabase/seed/teams.sql` — the 41 teams
+6. `supabase/seed/teams.sql` — the 41 teams
 
 Sanity check (should return **41**):
 
@@ -159,6 +161,21 @@ Eric as `viewer`), reset passwords, change roles, and deactivate/delete people.
 Deactivation bans the auth user *and* flips `active=false`, so offboarding is
 real, not cosmetic.
 
+**Realtime** works once 0004 has run and the tables are in the
+`supabase_realtime` publication (the migration adds them). Two editors in the
+list at once will see each other's changes land with a small "… updated this"
+indicator. No dashboard toggle is required beyond the migration.
+
+## 8a. Inventory snapshot import — **[App, admin]** (optional, do last)
+
+On the **Admin** page, the **Inventory snapshot** panel takes the
+`tracking_fall_*.xlsx` export. Each upload **replaces** the snapshot. It never
+changes a moment — it shows the real licensing/warehouse values on each
+moment's editor (matched by team) and flags where they disagree with what was
+typed. The importer maps columns by header name; after your first import it
+reports which columns it mapped and which it ignored, so if your headers differ
+from the defaults, send me that list and I'll widen the aliases.
+
 ---
 
 ## 9. Deploy — **[Vercel]** (later)
@@ -177,6 +194,9 @@ The service-role key stays server-side (used only by the admin API routes).
 | 4.1 | `migrations/0001_schema.sql` | tables + enums |
 | 4.2 | `migrations/0002_rls.sql` | RLS + `is_active_user()` / `current_role_is()` |
 | 4.3 | `migrations/0003_history_trigger.sql` | audit trigger + stamping |
-| 4.4 | `seed/teams.sql` | 41 teams |
+| 4.4 | `migrations/0004_realtime_directory.sql` | member directory read + Realtime |
+| 4.5 | `migrations/0005_inventory.sql` | inventory snapshot table |
+| 4.6 | `seed/teams.sql` | 41 teams |
 | 6 | `pnpm test:rls` | **prove the boundary** |
 | 7 | `pnpm seed:moments` | import moments (after you send the JSON) |
+| 8a | Admin → Inventory snapshot | upload `tracking_fall_*.xlsx` (optional) |

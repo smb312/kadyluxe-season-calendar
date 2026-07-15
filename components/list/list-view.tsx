@@ -8,6 +8,8 @@ import { passesFilters, sortMoments, type SortKey } from "@/lib/filter-moments";
 import { updateMomentField, createMoment } from "@/lib/mutations";
 import { toCsv, downloadCsv } from "@/lib/csv";
 import { MomentDrawer, type EditTarget } from "@/components/moment/moment-drawer";
+import { useRealtimeMoments } from "@/lib/use-realtime";
+import { RealtimeIndicator } from "@/components/realtime-indicator";
 import { monthKey } from "@/lib/dates";
 import {
   CHANNELS,
@@ -39,7 +41,7 @@ const ROW_ACCENT: Record<MomentType, string> = {
 
 export function ListView({ initialMoments }: { initialMoments: Moment[] }) {
   const supabase = useMemo(() => createClient(), []);
-  const { canWrite, teamsByCode } = useApp();
+  const { canWrite, teamsByCode, profile } = useApp();
   const f = useFilters();
   const [moments, setMoments] = useState<Moment[]>(initialMoments);
   const [sortKey, setSortKey] = useState<SortKey>("date");
@@ -47,6 +49,19 @@ export function ListView({ initialMoments }: { initialMoments: Moment[] }) {
   const [target, setTarget] = useState<EditTarget>(null);
   const [flash, setFlash] = useState<string | null>(null);
   const focusValue = useRef<string>("");
+  // The exact field being edited, so realtime won't overwrite it mid-type.
+  const focusedField = useRef<{ id: string; key: string } | null>(null);
+
+  const { otherEditorId } = useRealtimeMoments(setMoments, { currentUserId: profile.id, focusedRef: focusedField });
+
+  function onFieldFocus(id: string, key: string, value: string) {
+    focusValue.current = value;
+    focusedField.current = { id, key };
+  }
+  function onFieldBlur(id: string, key: keyof Moment, value: string, transform?: (v: string) => unknown) {
+    focusedField.current = null;
+    if (value !== focusValue.current) persist(id, { [key]: transform ? transform(value) : value } as Partial<Moment>);
+  }
 
   const teamName = (code: string) => teamsByCode[code]?.name ?? code;
 
@@ -281,8 +296,8 @@ export function ListView({ initialMoments }: { initialMoments: Moment[] }) {
                       placeholder="Name this moment"
                       disabled={!canWrite}
                       onChange={(e) => patchLocal(m.id, { title: e.target.value })}
-                      onFocus={(e) => (focusValue.current = e.target.value)}
-                      onBlur={(e) => e.target.value !== focusValue.current && persist(m.id, { title: e.target.value })}
+                      onFocus={(e) => onFieldFocus(m.id, "title", e.target.value)}
+                      onBlur={(e) => onFieldBlur(m.id, "title", e.target.value)}
                       className={`${cellInput} font-semibold min-w-[230px]`}
                     />
                   </td>
@@ -330,8 +345,8 @@ export function ListView({ initialMoments }: { initialMoments: Moment[] }) {
                       placeholder="—"
                       disabled={!canWrite}
                       onChange={(e) => patchLocal(m.id, { owner: e.target.value })}
-                      onFocus={(e) => (focusValue.current = e.target.value)}
-                      onBlur={(e) => e.target.value !== focusValue.current && persist(m.id, { owner: e.target.value || null })}
+                      onFocus={(e) => onFieldFocus(m.id, "owner", e.target.value)}
+                      onBlur={(e) => onFieldBlur(m.id, "owner", e.target.value, (v) => v || null)}
                       className={`${cellInput} min-w-[110px] text-[12px]`}
                     />
                   </td>
@@ -343,8 +358,8 @@ export function ListView({ initialMoments }: { initialMoments: Moment[] }) {
                       placeholder="—"
                       disabled={!canWrite}
                       onChange={(e) => patchLocal(m.id, { product_note: e.target.value })}
-                      onFocus={(e) => (focusValue.current = e.target.value)}
-                      onBlur={(e) => e.target.value !== focusValue.current && persist(m.id, { product_note: e.target.value || null })}
+                      onFocus={(e) => onFieldFocus(m.id, "product_note", e.target.value)}
+                      onBlur={(e) => onFieldBlur(m.id, "product_note", e.target.value, (v) => v || null)}
                       className={`${cellInput} min-w-[170px] text-[12px]`}
                     />
                   </td>
@@ -370,8 +385,8 @@ export function ListView({ initialMoments }: { initialMoments: Moment[] }) {
                       placeholder="—"
                       disabled={!canWrite}
                       onChange={(e) => patchLocal(m.id, { notes: e.target.value })}
-                      onFocus={(e) => (focusValue.current = e.target.value)}
-                      onBlur={(e) => e.target.value !== focusValue.current && persist(m.id, { notes: e.target.value || null })}
+                      onFocus={(e) => onFieldFocus(m.id, "notes", e.target.value)}
+                      onBlur={(e) => onFieldBlur(m.id, "notes", e.target.value, (v) => v || null)}
                       className={`${cellInput} min-w-[250px] h-[30px] resize-y text-[12px] leading-snug`}
                     />
                   </td>
@@ -396,6 +411,7 @@ export function ListView({ initialMoments }: { initialMoments: Moment[] }) {
       </div>
 
       <MomentDrawer target={target} onClose={() => setTarget(null)} onUpsert={upsert} onRemove={removeMoment} />
+      <RealtimeIndicator otherEditorId={otherEditorId} />
     </div>
   );
 }

@@ -1,7 +1,17 @@
 import { createClient } from "@/lib/supabase/server";
-import type { Moment, MomentRow, Team } from "@/lib/types";
+import type { MemberDirectory, Moment, MomentRow, Team } from "@/lib/types";
 
 // Server-side reads. RLS still applies (these run as the signed-in user).
+
+// id -> display name. Before migration 0004 broadens profile reads, RLS returns
+// only the caller's own row, so this degrades to just the current user.
+export async function getDirectory(): Promise<MemberDirectory> {
+  const supabase = await createClient();
+  const { data } = await supabase.from("profiles").select("id, full_name, email");
+  const dir: MemberDirectory = {};
+  for (const p of data ?? []) dir[p.id] = p.full_name || p.email;
+  return dir;
+}
 
 export async function getTeams(): Promise<Team[]> {
   const supabase = await createClient();

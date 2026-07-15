@@ -9,6 +9,8 @@ import { MONTHS } from "@/lib/constants";
 import type { Moment } from "@/lib/types";
 import { MomentCard } from "@/components/calendar/moment-card";
 import { MomentDrawer, type EditTarget } from "@/components/moment/moment-drawer";
+import { useRealtimeMoments } from "@/lib/use-realtime";
+import { RealtimeIndicator } from "@/components/realtime-indicator";
 
 const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
@@ -20,11 +22,12 @@ interface BandSeg {
 }
 
 export function CalendarView({ initialMoments }: { initialMoments: Moment[] }) {
-  const { teamsByCode } = useApp();
+  const { teamsByCode, profile } = useApp();
   const f = useFilters();
   const [moments, setMoments] = useState<Moment[]>(initialMoments);
   const [monthIdx, setMonthIdx] = useState(0);
   const [target, setTarget] = useState<EditTarget>(null);
+  const { otherEditorId } = useRealtimeMoments(setMoments, { currentUserId: profile.id });
 
   const filterState = { types: f.types, channels: f.channels, team: f.team, brandOnly: f.brandOnly };
 
@@ -185,6 +188,7 @@ export function CalendarView({ initialMoments }: { initialMoments: Moment[] }) {
       </div>
 
       <MomentDrawer target={target} onClose={() => setTarget(null)} onUpsert={upsert} onRemove={remove} />
+      <RealtimeIndicator otherEditorId={otherEditorId} />
     </div>
   );
 }

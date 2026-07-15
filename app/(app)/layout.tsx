@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { getProfile } from "@/lib/auth";
-import { getTeams } from "@/lib/data";
+import { getTeams, getDirectory } from "@/lib/data";
 import { AppProvider } from "@/components/app-context";
 import { AppShell } from "@/components/app-shell";
 
@@ -14,10 +14,10 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     redirect("/login");
   }
 
-  const teams = await getTeams();
+  const [teams, directory] = await Promise.all([getTeams(), getDirectory()]);
 
   return (
-    <AppProvider profile={profile} teams={teams}>
+    <AppProvider profile={profile} teams={teams} directory={directory}>
       <AppShell>{children}</AppShell>
     </AppProvider>
   );

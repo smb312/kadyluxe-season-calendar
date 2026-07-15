@@ -56,6 +56,25 @@ export interface MomentHistory {
   at: string;
 }
 
+export interface InventorySnapshot {
+  id: number;
+  imported_at: string;
+  imported_by: string | null;
+  po: string | null;
+  status: string | null;
+  licensing: string | null;
+  team_raw: string | null;
+  team_code: string | null;
+  style: string | null;
+  color: string | null;
+  units: number | null;
+  target_launch: string | null;
+  received_3pl: string | null;
+}
+
+// Display-name directory: id -> full name (for "who changed this" indicators).
+export type MemberDirectory = Record<string, string>;
+
 // Fields an editor can write through the UI.
 export type MomentInput = Pick<
   MomentRow,
