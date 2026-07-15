@@ -3,10 +3,14 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useApp } from "@/components/app-context";
+import { FilterBar } from "@/components/filters/filter-bar";
 
-// Views wired so far. Calendar/Team arrive in a later phase; adding them here
-// is a one-line change once their routes exist.
-const VIEWS = [{ href: "/list", label: "List" }];
+// Views wired so far. Team arrives in a later phase; adding it here is a
+// one-line change once its route exists.
+const VIEWS = [
+  { href: "/calendar", label: "Calendar" },
+  { href: "/list", label: "List" },
+];
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const { profile, isAdmin } = useApp();
@@ -51,24 +55,27 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       </header>
 
       {pathname !== "/admin" && (
-        <nav className="flex gap-0 border-b border-rule mb-[18px]" role="tablist">
-          {VIEWS.map((v) => {
-            const active = pathname === v.href;
-            return (
-              <Link
-                key={v.href}
-                href={v.href}
-                role="tab"
-                aria-selected={active}
-                className={`font-serif text-[17px] font-medium mr-6 py-2 border-b-2 ${
-                  active ? "text-ink border-ink" : "text-ink-38 border-transparent hover:text-ink"
-                }`}
-              >
-                {v.label}
-              </Link>
-            );
-          })}
-        </nav>
+        <>
+          <nav className="flex gap-0 border-b border-rule mb-[18px]" role="tablist">
+            {VIEWS.map((v) => {
+              const active = pathname === v.href || (v.href === "/team" && pathname.startsWith("/team"));
+              return (
+                <Link
+                  key={v.href}
+                  href={v.href}
+                  role="tab"
+                  aria-selected={active}
+                  className={`font-serif text-[17px] font-medium mr-6 py-2 border-b-2 ${
+                    active ? "text-ink border-ink" : "text-ink-38 border-transparent hover:text-ink"
+                  }`}
+                >
+                  {v.label}
+                </Link>
+              );
+            })}
+          </nav>
+          <FilterBar />
+        </>
       )}
 
       {children}

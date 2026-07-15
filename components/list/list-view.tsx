@@ -8,7 +8,6 @@ import { passesFilters, sortMoments, type SortKey } from "@/lib/filter-moments";
 import { updateMomentField, createMoment } from "@/lib/mutations";
 import { toCsv, downloadCsv } from "@/lib/csv";
 import { MomentDrawer, type EditTarget } from "@/components/moment/moment-drawer";
-import { FilterBar } from "@/components/filters/filter-bar";
 import { monthKey } from "@/lib/dates";
 import {
   CHANNELS,
@@ -173,8 +172,6 @@ export function ListView({ initialMoments }: { initialMoments: Moment[] }) {
           </div>
         ))}
       </div>
-
-      <FilterBar />
 
       {/* toolbar */}
       <div className="flex gap-2.5 items-center mb-3 flex-wrap">

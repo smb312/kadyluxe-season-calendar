@@ -25,3 +25,30 @@ export function shortDate(iso: string): string {
 export function monthKey(iso: string): string {
   return iso.slice(0, 7);
 }
+
+export function ymd(y: number, m: number, d: number): string {
+  return `${y}-${String(m + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+}
+
+export interface DayCell {
+  iso: string | null; // null = out-of-month padding
+  day: number | null;
+  weekend: boolean;
+}
+
+// Weeks (Sun–Sat) for a month, with leading/trailing padding cells so each
+// week has exactly 7 columns.
+export function buildMonthWeeks(y: number, m: number): DayCell[][] {
+  const first = new Date(y, m, 1).getDay(); // 0 = Sunday
+  const days = new Date(y, m + 1, 0).getDate();
+  const cells: DayCell[] = [];
+  for (let i = 0; i < first; i++) cells.push({ iso: null, day: null, weekend: false });
+  for (let d = 1; d <= days; d++) {
+    const dow = new Date(y, m, d).getDay();
+    cells.push({ iso: ymd(y, m, d), day: d, weekend: dow === 0 || dow === 6 });
+  }
+  while (cells.length % 7 !== 0) cells.push({ iso: null, day: null, weekend: false });
+  const weeks: DayCell[][] = [];
+  for (let i = 0; i < cells.length; i += 7) weeks.push(cells.slice(i, i + 7));
+  return weeks;
+}
